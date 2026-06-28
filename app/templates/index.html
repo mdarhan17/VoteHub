@@ -1,34 +1,101 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="landing-hero">
+<section class="mega-hero">
+    <div class="hero-grid"></div>
+    <div class="hero-blob blob-one"></div>
+    <div class="hero-blob blob-two"></div>
+
     <div class="container">
-        <div class="row align-items-center min-vh-100">
-            <div class="col-md-7">
-                <span class="hero-badge">Secure Digital Election Platform</span>
-                <h1>VoteHub</h1>
-                <h3>A Secure Online Voting & Election Management System</h3>
-                <p>
-                    VoteHub helps institutions conduct secure, transparent, and paperless elections
-                    with voter verification, candidate management, vote tracking, and instant results.
+        <div class="row align-items-center min-vh-100 g-5">
+            <div class="col-lg-7">
+                <div class="hero-kicker">
+                    <i class="bi bi-shield-check"></i>
+                    Secure Digital Election Platform
+                </div>
+
+                <h1 class="mega-title">
+                    Vote Smarter.
+                    <span>Vote Safer.</span>
+                </h1>
+
+                <p class="mega-subtitle">
+                    VoteHub is a modern online voting and election management system
+                    built for secure voter verification, one-person-one-vote control,
+                    candidate management, result publishing, and transparent analytics.
                 </p>
 
-                <div class="d-flex gap-3 mt-4">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Get Started</a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
+                        Start Voting
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary">
+                        Admin / Voter Login
+                    </a>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <h4>100%</h4>
+                        <p>Digital</p>
+                    </div>
+                    <div>
+                        <h4>1 Vote</h4>
+                        <p>Per Voter</p>
+                    </div>
+                    <div>
+                        <h4>Live</h4>
+                        <p>Results</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-5">
-                <div class="hero-card">
-                    <h4>System Highlights</h4>
-                    <ul>
-                        <li>Secure voter authentication</li>
-                        <li>One voter, one vote policy</li>
-                        <li>Admin election control</li>
-                        <li>Candidate-wise result dashboard</li>
-                        <li>Vote receipt and audit trail</li>
-                    </ul>
+            <div class="col-lg-5">
+                <div class="floating-dashboard">
+                    <div class="dash-head">
+                        <div>
+                            <span>Election Status</span>
+                            <h5>Student Council Election</h5>
+                        </div>
+                        <span class="live-badge">Live</span>
+                    </div>
+
+                    <div class="vote-progress">
+                        <div class="progress-row">
+                            <span>Voter Turnout</span>
+                            <b>78%</b>
+                        </div>
+                        <div class="progress-line">
+                            <span style="width:78%"></span>
+                        </div>
+                    </div>
+
+                    <div class="mini-result-card winner">
+                        <i class="bi bi-trophy-fill"></i>
+                        <div>
+                            <h6>Leading Candidate</h6>
+                            <p>Aisha Khan · 428 Votes</p>
+                        </div>
+                    </div>
+
+                    <div class="mini-result-grid">
+                        <div>
+                            <i class="bi bi-people-fill"></i>
+                            <h6>1,240</h6>
+                            <p>Voters</p>
+                        </div>
+                        <div>
+                            <i class="bi bi-person-badge-fill"></i>
+                            <h6>12</h6>
+                            <p>Candidates</p>
+                        </div>
+                    </div>
+
+                    <div class="secure-strip">
+                        <i class="bi bi-lock-fill"></i>
+                        Encrypted vote receipt generated
+                    </div>
                 </div>
             </div>
         </div>

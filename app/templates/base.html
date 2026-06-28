@@ -5,73 +5,111 @@
     <title>VoteHub | Secure Online Voting</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
 {% if session.get('user_id') %}
-<div class="app-layout">
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">VH</div>
+<div class="app-shell">
+
+    <aside class="premium-sidebar">
+        <div class="sidebar-brand">
+            <div class="logo-orb">VH</div>
             <div>
-                <h5>VoteHub</h5>
-                <small>Secure Voting</small>
+                <h4>VoteHub</h4>
+                <span>Election OS</span>
             </div>
         </div>
 
-        <div class="user-box">
-            <p class="mb-0 fw-bold">{{ session.get('full_name') }}</p>
-            <small>{{ session.get('role')|capitalize }}</small>
+        <div class="profile-mini">
+            <div class="avatar-glow">
+                {{ session.get('full_name')[0]|upper }}
+            </div>
+            <div>
+                <h6>{{ session.get('full_name') }}</h6>
+                <span>{{ session.get('role')|capitalize }} Account</span>
+            </div>
         </div>
 
-        <nav class="menu">
-            {% if session.get('role') == 'admin' %}
-                <a href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-                <a href="{{ url_for('admin.voters') }}"><i class="bi bi-people"></i> Voters</a>
-                <a href="{{ url_for('candidate.candidates') }}"><i class="bi bi-person-badge"></i> Candidates</a>
-                <a href="{{ url_for('election.elections') }}"><i class="bi bi-calendar-event"></i> Elections</a>
-                <a href="{{ url_for('result.results') }}"><i class="bi bi-bar-chart"></i> Results</a>
-            {% else %}
-                <a href="{{ url_for('voter.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-                <a href="{{ url_for('voter.profile') }}"><i class="bi bi-person-circle"></i> My Profile</a>
-                <a href="{{ url_for('voter.history') }}"><i class="bi bi-clock-history"></i> Vote History</a>
-            {% endif %}
+        <div class="nav-label">Main Menu</div>
 
-            <a href="{{ url_for('auth.logout') }}" class="logout-link"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        <nav class="premium-menu">
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
+                <a href="{{ url_for('admin.voters') }}"><i class="bi bi-people-fill"></i><span>Voters</span></a>
+                <a href="{{ url_for('candidate.candidates') }}"><i class="bi bi-person-badge-fill"></i><span>Candidates</span></a>
+                <a href="{{ url_for('election.elections') }}"><i class="bi bi-calendar2-event-fill"></i><span>Elections</span></a>
+                <a href="{{ url_for('result.results') }}"><i class="bi bi-bar-chart-fill"></i><span>Results</span></a>
+            {% else %}
+                <a href="{{ url_for('voter.dashboard') }}"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
+                <a href="{{ url_for('voter.profile') }}"><i class="bi bi-person-circle"></i><span>My Profile</span></a>
+                <a href="{{ url_for('voter.history') }}"><i class="bi bi-clock-history"></i><span>Vote History</span></a>
+            {% endif %}
         </nav>
+
+        <div class="sidebar-bottom-card">
+            <i class="bi bi-shield-lock-fill"></i>
+            <h6>Secure Session</h6>
+            <p>Your activity is protected with role-based access.</p>
+        </div>
+
+        <a href="{{ url_for('auth.logout') }}" class="premium-logout">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
     </aside>
 
-    <main class="main-content">
-        <div class="topbar">
+    <main class="premium-main">
+        <header class="premium-topbar">
             <div>
-                <h6 class="mb-0">VoteHub System</h6>
-                <small>Secure Online Voting & Election Management</small>
+                <span class="eyebrow">VoteHub Control Center</span>
+                <h5>Secure Online Voting & Election Management</h5>
             </div>
-            <span class="badge bg-primary">{{ session.get('role')|capitalize }}</span>
-        </div>
+
+            <div class="topbar-actions">
+                <div class="status-pill">
+                    <span class="live-dot"></span>
+                    System Online
+                </div>
+                <div class="role-pill">
+                    {{ session.get('role')|capitalize }}
+                </div>
+            </div>
+        </header>
+
 {% else %}
-<nav class="navbar navbar-expand-lg public-navbar">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-white" href="/">VoteHub</a>
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('auth.login') }}" class="btn btn-light btn-sm">Login</a>
-            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-sm">Register</a>
+
+<nav class="premium-public-nav">
+    <div class="container nav-inner">
+        <a class="public-brand" href="/">
+            <span class="logo-orb small">VH</span>
+            <span>VoteHub</span>
+        </a>
+
+        <div class="public-nav-actions">
+            <a href="{{ url_for('auth.login') }}" class="nav-login">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="nav-register">Create Account</a>
         </div>
     </div>
 </nav>
 
 <main class="public-main">
+
 {% endif %}
 
-<div class="flash-area container-fluid mt-3">
+<div class="flash-area container-fluid">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                <div class="alert alert-{{ category }} alert-dismissible fade show premium-alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>

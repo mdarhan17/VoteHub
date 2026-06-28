@@ -1,0 +1,38 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<section class="auth-screen">
+    <div class="auth-bg-orb one"></div>
+    <div class="auth-bg-orb two"></div>
+
+    <div class="auth-panel">
+        <div class="auth-logo">
+            <span class="logo-orb">VH</span>
+            <div>
+                <h3>Verify OTP</h3>
+                <p>Enter the 6-digit OTP for {{ email }}</p>
+            </div>
+        </div>
+
+        <form method="POST" class="premium-form">
+            <div class="input-wrap">
+                <label>OTP Code</label>
+                <div class="input-icon">
+                    <i class="bi bi-shield-lock"></i>
+                    <input type="text" name="otp_code" placeholder="Enter 6-digit OTP" maxlength="6" required>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-submit">
+                Verify Account
+                <i class="bi bi-check-circle"></i>
+            </button>
+        </form>
+
+        <p class="auth-switch">
+            Did not receive OTP?
+            <a href="{{ url_for('auth.resend_otp') }}">Resend OTP</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

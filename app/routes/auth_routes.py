@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+﻿from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.extensions import mysql
 from app.utils.security import hash_password, check_password
+from app.services.otp_service import save_otp, verify_otp_code
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -25,31 +26,78 @@ def register():
             flash("Passwords do not match.", "danger")
             return redirect(url_for("auth.register"))
 
-        hashed_password = hash_password(password)
-
         cur = mysql.connection.cursor()
-
         cur.execute("SELECT * FROM users WHERE email=%s", (email,))
         existing_user = cur.fetchone()
 
         if existing_user:
             cur.close()
-            flash("Email already registered.", "warning")
+            flash("Email already registered. Please login.", "warning")
             return redirect(url_for("auth.login"))
+
+        hashed_password = hash_password(password)
 
         cur.execute("""
             INSERT INTO users 
             (full_name, email, phone, password_hash, role, status, email_verified)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (full_name, email, phone, hashed_password, "voter", "active", 1))
+            VALUES (%s, %s, %s, %s, 'voter', 'pending', 0)
+        """, (full_name, email, phone, hashed_password))
 
         mysql.connection.commit()
         cur.close()
 
-        flash("Registration successful. Please login.", "success")
-        return redirect(url_for("auth.login"))
+        otp = save_otp(email, "register")
+        session["pending_email"] = email
+
+        flash(f"Registration successful. Demo OTP: {otp}", "success")
+        return redirect(url_for("auth.verify_otp"))
 
     return render_template("auth/register.html")
+
+@auth_bp.route("/verify-otp", methods=["GET", "POST"])
+def verify_otp():
+    email = session.get("pending_email")
+
+    if not email:
+        flash("No email found for OTP verification.", "warning")
+        return redirect(url_for("auth.register"))
+
+    if request.method == "POST":
+        otp_code = request.form.get("otp_code")
+
+        is_valid, message = verify_otp_code(email, otp_code, "register")
+
+        if not is_valid:
+            flash(message, "danger")
+            return redirect(url_for("auth.verify_otp"))
+
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            UPDATE users
+            SET email_verified=1, status='active'
+            WHERE email=%s
+        """, (email,))
+        mysql.connection.commit()
+        cur.close()
+
+        session.pop("pending_email", None)
+
+        flash("Email verified successfully. Please login.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/verify_otp.html", email=email)
+
+@auth_bp.route("/resend-otp")
+def resend_otp():
+    email = session.get("pending_email")
+
+    if not email:
+        flash("No email found for OTP resend.", "warning")
+        return redirect(url_for("auth.register"))
+
+    otp = save_otp(email, "register")
+    flash(f"New Demo OTP: {otp}", "info")
+    return redirect(url_for("auth.verify_otp"))
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -70,8 +118,18 @@ def login():
             flash("Invalid email or password.", "danger")
             return redirect(url_for("auth.login"))
 
+        if user["email_verified"] == 0:
+            session["pending_email"] = user["email"]
+            otp = save_otp(user["email"], "register")
+            flash(f"Please verify your email first. Demo OTP: {otp}", "warning")
+            return redirect(url_for("auth.verify_otp"))
+
         if user["status"] == "blocked":
             flash("Your account is blocked. Contact admin.", "danger")
+            return redirect(url_for("auth.login"))
+
+        if user["status"] == "pending":
+            flash("Your account is pending verification.", "warning")
             return redirect(url_for("auth.login"))
 
         session["user_id"] = user["user_id"]
@@ -83,8 +141,8 @@ def login():
 
         if user["role"] == "admin":
             return redirect(url_for("admin.dashboard"))
-        else:
-            return redirect(url_for("voter.dashboard"))
+
+        return redirect(url_for("voter.dashboard"))
 
     return render_template("auth/login.html")
 

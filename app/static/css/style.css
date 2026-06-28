@@ -1120,3 +1120,176 @@ textarea:focus {
     }
 }
 
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title h5 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.section-title p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.premium-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px !important;
+    margin-top: 18px;
+}
+
+.action-card {
+    position: relative;
+    min-height: 135px;
+    display: flex !important;
+    align-items: center;
+    gap: 16px;
+    padding: 22px !important;
+    border-radius: 26px !important;
+    text-decoration: none !important;
+    overflow: hidden;
+    background: rgba(255,255,255,.75) !important;
+    border: 1px solid rgba(255,255,255,.9) !important;
+    box-shadow: 0 18px 50px rgba(15,23,42,.09);
+    transition: .28s ease;
+}
+
+.action-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: .28s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-8px) scale(1.015);
+    box-shadow: 0 30px 75px rgba(15,23,42,.16);
+}
+
+.action-card:hover::before {
+    opacity: 1;
+}
+
+.action-card div,
+.action-card i {
+    position: relative;
+    z-index: 1;
+}
+
+.action-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    color: white;
+    flex: 0 0 58px;
+    font-size: 24px;
+    box-shadow: 0 18px 36px rgba(15,23,42,.18);
+}
+
+.action-card h6 {
+    margin: 0;
+    color: var(--dark);
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.action-card p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+    font-weight: 700;
+}
+
+.action-arrow {
+    margin-left: auto;
+    color: #94a3b8;
+    font-size: 20px;
+    transition: .25s ease;
+}
+
+.action-card:hover .action-arrow {
+    transform: translateX(6px);
+    color: white;
+}
+
+.action-card:hover h6,
+.action-card:hover p {
+    color: white;
+}
+
+.blue-action .action-icon {
+    background: linear-gradient(135deg, #2563eb, #00c2ff);
+}
+
+.purple-action .action-icon {
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+}
+
+.green-action .action-icon {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.orange-action .action-icon {
+    background: linear-gradient(135deg, #f97316, #f59e0b);
+}
+
+.blue-action::before {
+    background: linear-gradient(135deg, #2563eb, #00c2ff);
+}
+
+.purple-action::before {
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+}
+
+.green-action::before {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.orange-action::before {
+    background: linear-gradient(135deg, #f97316, #f59e0b);
+}
+
+.approval-card {
+    min-height: 315px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.approval-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, #f97316, #f59e0b);
+    color: white;
+    font-size: 28px;
+    box-shadow: 0 18px 38px rgba(249,115,22,.28);
+}
+
+.approval-card h2 {
+    font-size: 54px;
+    font-weight: 900;
+    margin: 10px 0;
+}
+
+@media (max-width: 992px) {
+    .premium-actions {
+        grid-template-columns: 1fr;
+    }
+}

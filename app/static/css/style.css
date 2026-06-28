@@ -1609,3 +1609,45 @@ textarea:focus {
         transition: none !important;
     }
 }
+
+/* FIX NAVBAR OVERLAP ISSUE */
+.premium-public-nav {
+    position: sticky !important;
+    top: 16px !important;
+    left: auto !important;
+    transform: none !important;
+    width: min(1120px, calc(100% - 32px)) !important;
+    margin: 16px auto 0 !important;
+    z-index: 999 !important;
+}
+
+.public-main {
+    padding-top: 20px !important;
+}
+
+.auth-screen {
+    min-height: calc(100vh - 110px) !important;
+    padding: 45px 18px 50px !important;
+}
+
+.flash-area {
+    position: relative !important;
+    z-index: 50 !important;
+    margin-top: 18px !important;
+}
+
+.auth-panel {
+    margin-top: 10px !important;
+}
+
+@media (max-width: 768px) {
+    .premium-public-nav {
+        top: 10px !important;
+        width: calc(100% - 20px) !important;
+        margin-top: 10px !important;
+    }
+
+    .auth-screen {
+        padding-top: 35px !important;
+    }
+}

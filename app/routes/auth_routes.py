@@ -2,6 +2,7 @@
 from app.extensions import mysql
 from app.utils.security import hash_password, check_password
 from app.services.otp_service import save_otp, verify_otp_code
+from app.services.email_service import send_otp_email
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -47,9 +48,15 @@ def register():
         cur.close()
 
         otp = save_otp(email, "register")
+        sent, msg = send_otp_email(email, otp)
+
         session["pending_email"] = email
 
-        flash(f"Registration successful. Demo OTP: {otp}", "success")
+        if sent:
+            flash("Registration successful. OTP sent to your email.", "success")
+        else:
+            flash(f"Email sending failed. Demo OTP: {otp}. Error: {msg}", "warning")
+
         return redirect(url_for("auth.verify_otp"))
 
     return render_template("auth/register.html")
@@ -96,7 +103,13 @@ def resend_otp():
         return redirect(url_for("auth.register"))
 
     otp = save_otp(email, "register")
-    flash(f"New Demo OTP: {otp}", "info")
+    sent, msg = send_otp_email(email, otp)
+
+    if sent:
+        flash("New OTP sent to your email.", "info")
+    else:
+        flash(f"Email sending failed. Demo OTP: {otp}. Error: {msg}", "warning")
+
     return redirect(url_for("auth.verify_otp"))
 
 @auth_bp.route("/login", methods=["GET", "POST"])
@@ -121,7 +134,13 @@ def login():
         if user["email_verified"] == 0:
             session["pending_email"] = user["email"]
             otp = save_otp(user["email"], "register")
-            flash(f"Please verify your email first. Demo OTP: {otp}", "warning")
+            sent, msg = send_otp_email(user["email"], otp)
+
+            if sent:
+                flash("Please verify your email first. OTP sent to your email.", "warning")
+            else:
+                flash(f"Please verify your email first. Demo OTP: {otp}. Error: {msg}", "warning")
+
             return redirect(url_for("auth.verify_otp"))
 
         if user["status"] == "blocked":

@@ -1737,3 +1737,108 @@ textarea:focus {
 .input-wrap.has-error input {
     border-color: #dc2626 !important;
 }
+
+/* FORCE PASSWORD EYE ICON FIX */
+.password-field {
+    position: relative !important;
+}
+
+.password-field input {
+    padding-right: 60px !important;
+}
+
+.password-toggle {
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 40px !important;
+    height: 40px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: rgba(37, 99, 235, 0.12) !important;
+    color: #2563eb !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99 !important;
+    cursor: pointer !important;
+}
+
+.password-toggle i {
+    position: static !important;
+    transform: none !important;
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-size: 18px !important;
+    pointer-events: none !important;
+}
+
+.password-toggle:hover {
+    background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+    color: #ffffff !important;
+}
+
+.input-icon.password-field > i:first-child {
+    z-index: 5 !important;
+}
+
+.field-error {
+    display: block;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 7px;
+    min-height: 15px;
+}
+
+.password-field {
+    position: relative !important;
+}
+
+.password-field input {
+    padding-right: 58px !important;
+}
+
+.password-toggle {
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 40px !important;
+    height: 40px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: rgba(37, 99, 235, 0.12) !important;
+    color: #2563eb !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99 !important;
+    cursor: pointer !important;
+}
+
+.password-toggle i {
+    position: static !important;
+    transform: none !important;
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-size: 18px !important;
+    pointer-events: none !important;
+}
+
+.password-toggle:hover {
+    background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+    color: #ffffff !important;
+}
+
+.field-error {
+    display: block;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 7px;
+    min-height: 15px;
+}

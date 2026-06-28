@@ -14,21 +14,26 @@
             </div>
         </div>
 
-        <form method="POST" class="premium-form">
+        <form method="POST" class="premium-form" id="loginForm" novalidate>
             <div class="input-wrap">
                 <label>Email Address</label>
                 <div class="input-icon">
                     <i class="bi bi-envelope"></i>
-                    <input type="email" name="email" placeholder="Enter your email" required>
+                    <input type="email" name="email" id="loginEmail" placeholder="Enter your email" required>
                 </div>
+                <small class="field-error" id="loginEmailError"></small>
             </div>
 
             <div class="input-wrap">
                 <label>Password</label>
-                <div class="input-icon">
+                <div class="input-icon password-field">
                     <i class="bi bi-lock"></i>
-                    <input type="password" name="password" placeholder="Enter your password" required>
+                    <input type="password" name="password" id="loginPassword" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle" data-target="loginPassword">
+                        <i class="bi bi-eye-fill"></i>
+                    </button>
                 </div>
+                <small class="field-error" id="loginPasswordError"></small>
             </div>
 
             <button type="submit" class="auth-submit">
@@ -44,4 +49,3 @@
     </div>
 </section>
 {% endblock %}
-

@@ -1293,3 +1293,319 @@ textarea:focus {
         grid-template-columns: 1fr;
     }
 }
+
+/* ===============================
+   PREMIUM POLISH HOVER EFFECTS
+   =============================== */
+
+.panel-card,
+.stat-card,
+.candidate-card,
+.action-card,
+.card {
+    position: relative;
+    isolation: isolate;
+    transform-style: preserve-3d;
+}
+
+.panel-card::after,
+.stat-card::after,
+.candidate-card::after,
+.action-card::after,
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,.55),
+        rgba(255,255,255,.12),
+        rgba(37,99,235,.10)
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease;
+    z-index: -1;
+}
+
+.panel-card:hover::after,
+.stat-card:hover::after,
+.candidate-card:hover::after,
+.action-card:hover::after,
+.card:hover::after {
+    opacity: 1;
+}
+
+.panel-card:hover,
+.card:hover {
+    transform: translateY(-8px) scale(1.008);
+    box-shadow:
+        0 38px 90px rgba(15,23,42,.18),
+        0 0 0 1px rgba(255,255,255,.65) inset;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px) scale(1.025);
+    box-shadow:
+        0 42px 95px rgba(15,23,42,.20),
+        0 0 35px rgba(37,99,235,.12);
+}
+
+.stat-card:hover i {
+    transform: rotate(-6deg) scale(1.12);
+}
+
+.stat-card i,
+.action-icon,
+.approval-icon,
+.logo-orb,
+.avatar-glow {
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.action-card {
+    border: 1px solid rgba(255,255,255,.85) !important;
+}
+
+.action-card:hover {
+    transform: translateY(-10px) scale(1.025);
+    box-shadow:
+        0 36px 90px rgba(15,23,42,.20),
+        0 0 45px rgba(37,99,235,.18);
+}
+
+.action-card:hover .action-icon {
+    transform: rotate(-7deg) scale(1.12);
+    box-shadow:
+        0 22px 45px rgba(15,23,42,.26),
+        0 0 25px rgba(255,255,255,.28);
+}
+
+.action-card:hover h6 {
+    letter-spacing: .2px;
+}
+
+.action-card:hover p {
+    opacity: .95;
+}
+
+.action-arrow {
+    opacity: .75;
+}
+
+.action-card:hover .action-arrow {
+    opacity: 1;
+    transform: translateX(10px) scale(1.15);
+}
+
+.premium-menu a {
+    transition:
+        transform .28s ease,
+        color .28s ease,
+        box-shadow .28s ease,
+        background .28s ease;
+}
+
+.premium-menu a:hover {
+    transform: translateX(9px) scale(1.018);
+    box-shadow:
+        0 16px 35px rgba(37,99,235,.24),
+        inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+.premium-menu a:hover i {
+    transform: scale(1.18) rotate(-4deg);
+    color: #93c5fd;
+}
+
+.premium-menu a i {
+    transition: .28s ease;
+}
+
+.premium-logout:hover {
+    transform: translateX(9px) scale(1.018);
+    box-shadow: 0 16px 35px rgba(239,68,68,.24);
+}
+
+.premium-sidebar {
+    transition: box-shadow .35s ease, transform .35s ease;
+}
+
+.premium-sidebar:hover {
+    box-shadow:
+        0 42px 110px rgba(8,17,31,.44),
+        0 0 55px rgba(37,99,235,.12);
+}
+
+.premium-topbar {
+    transition: box-shadow .35s ease, transform .35s ease;
+}
+
+.premium-topbar:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 30px 85px rgba(15,23,42,.16),
+        0 0 35px rgba(37,99,235,.10);
+}
+
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before,
+.auth-submit::before,
+.btn-hero-primary::before,
+.nav-register::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.45),
+        transparent
+    );
+    transition: .6s ease;
+}
+
+.btn:hover::before,
+.auth-submit:hover::before,
+.btn-hero-primary:hover::before,
+.nav-register:hover::before {
+    left: 140%;
+}
+
+.btn:hover {
+    box-shadow:
+        0 18px 40px rgba(37,99,235,.24),
+        0 0 22px rgba(124,58,237,.12);
+}
+
+.form-control,
+.form-select,
+.input-icon input {
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease,
+        background .25s ease;
+}
+
+.form-control:hover,
+.form-select:hover,
+.input-icon input:hover {
+    transform: translateY(-1px);
+    background: rgba(255,255,255,.9) !important;
+    box-shadow: 0 12px 26px rgba(15,23,42,.06);
+}
+
+.form-control:focus,
+.form-select:focus,
+.input-icon input:focus {
+    transform: translateY(-2px);
+}
+
+.table tbody tr:hover {
+    transform: scale(1.004);
+    box-shadow: 0 10px 25px rgba(15,23,42,.06);
+}
+
+.candidate-card:hover {
+    transform: translateY(-12px) scale(1.018);
+    box-shadow:
+        0 42px 95px rgba(15,23,42,.22),
+        0 0 42px rgba(37,99,235,.14);
+}
+
+.candidate-card:hover .candidate-body h5 {
+    color: var(--blue);
+}
+
+.candidate-body h5,
+.candidate-body .party {
+    transition: .25s ease;
+}
+
+.symbol-img:hover {
+    transform: rotate(-5deg) scale(1.10);
+    box-shadow: 0 16px 35px rgba(37,99,235,.18);
+}
+
+.symbol-img {
+    transition: .28s ease;
+}
+
+.list-group-item:hover {
+    transform: translateX(10px) scale(1.01);
+    background: rgba(255,255,255,.92);
+    box-shadow:
+        0 22px 55px rgba(15,23,42,.12),
+        0 0 28px rgba(37,99,235,.08);
+}
+
+.hero-stats div {
+    transition: .3s ease;
+}
+
+.hero-stats div:hover {
+    transform: translateY(-8px) scale(1.04);
+    box-shadow:
+        0 28px 65px rgba(15,23,42,.16),
+        0 0 35px rgba(37,99,235,.12);
+}
+
+.floating-dashboard {
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.floating-dashboard:hover {
+    transform: perspective(900px) rotateY(-2deg) rotateX(1deg) translateY(-10px);
+    box-shadow:
+        0 55px 120px rgba(8,17,31,.45),
+        0 0 55px rgba(37,99,235,.22);
+}
+
+.hero-kicker {
+    animation: softFloat 4s ease-in-out infinite;
+}
+
+.logo-orb:hover,
+.avatar-glow:hover {
+    transform: rotate(-8deg) scale(1.08);
+}
+
+@keyframes softFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(37,99,235,.28);
+    }
+    50% {
+        box-shadow: 0 0 0 12px rgba(37,99,235,0);
+    }
+}
+
+.live-dot {
+    animation: pulseGlow 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

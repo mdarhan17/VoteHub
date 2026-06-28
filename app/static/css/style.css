@@ -1651,3 +1651,89 @@ textarea:focus {
         padding-top: 35px !important;
     }
 }
+
+/* LOGIN / REGISTER INPUT ICON FIX */
+.input-icon {
+    position: relative;
+}
+
+.input-icon i {
+    position: absolute !important;
+    left: 18px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #2563eb !important;
+    z-index: 5 !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+}
+
+.input-icon input {
+    position: relative;
+    z-index: 1;
+    padding-left: 52px !important;
+}
+
+.input-icon:hover i,
+.input-icon:focus-within i {
+    color: #7c3aed !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Password eye toggle and validation */
+.password-field input {
+    padding-right: 54px !important;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: rgba(37,99,235,0.08);
+    color: #2563eb;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    z-index: 10;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.password-toggle:hover {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #ffffff;
+}
+
+.password-toggle i {
+    position: static !important;
+    transform: none !important;
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.field-error {
+    display: block;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 7px;
+    min-height: 15px;
+}
+
+.password-hint {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 7px;
+}
+
+.input-wrap.has-error input {
+    border-color: #dc2626 !important;
+}

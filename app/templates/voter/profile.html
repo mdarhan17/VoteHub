@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Voter Profile</h2>
+            <p class="text-muted">Complete your voter verification details.</p>
+        </div>
+        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-primary">Back</a>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" value="{{ user.full_name }}" class="form-control" disabled>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" value="{{ user.email }}" class="form-control" disabled>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" name="date_of_birth" value="{{ voter.date_of_birth if voter else '' }}" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Gender</label>
+                    <select name="gender" class="form-control" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male" {% if voter and voter.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if voter and voter.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if voter and voter.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">ID Type</label>
+                    <select name="id_type" class="form-control" required>
+                        <option value="">Select ID Type</option>
+                        <option value="College ID" {% if voter and voter.id_type == 'College ID' %}selected{% endif %}>College ID</option>
+                        <option value="Employee ID" {% if voter and voter.id_type == 'Employee ID' %}selected{% endif %}>Employee ID</option>
+                        <option value="Government ID" {% if voter and voter.id_type == 'Government ID' %}selected{% endif %}>Government ID</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">ID Number</label>
+                    <input type="text" name="id_number" value="{{ voter.id_number if voter else '' }}" class="form-control" required>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Address</label>
+                    <textarea name="address" class="form-control" rows="4" required>{{ voter.address if voter else '' }}</textarea>
+                </div>
+
+                <div class="col-md-12">
+                    <button class="btn btn-primary">Submit Profile</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

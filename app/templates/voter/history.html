@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Vote History</h2>
+            <p class="text-muted">Your completed voting records and receipts.</p>
+        </div>
+        <a href="{{ url_for('voter.dashboard') }}" class="btn btn-outline-primary">Back</a>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Receipt</th>
+                        <th>Election</th>
+                        <th>Candidate</th>
+                        <th>Vote Hash</th>
+                        <th>Voted At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if history %}
+                        {% for item in history %}
+                        <tr>
+                            <td><b>{{ item.receipt_code }}</b></td>
+                            <td>{{ item.election_title }}</td>
+                            <td>
+                                {{ item.candidate_name }}<br>
+                                <small>{{ item.party_name }}</small>
+                            </td>
+                            <td><small>{{ item.vote_hash }}</small></td>
+                            <td>{{ item.voted_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No vote history found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="page-header">
+        <h2>{{ election.title }}</h2>
+        <p>Total Votes Cast: <b>{{ total_votes }}</b></p>
+    </div>
+
+    <div class="panel-card">
+        <h5>Final Result</h5>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Rank</th>
+                        <th>Candidate</th>
+                        <th>Party</th>
+                        <th>Total Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in results %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <b>{{ item.full_name }}</b>
+                        </td>
+                        <td>{{ item.party_name }}</td>
+                        <td><b>{{ item.total_votes }}</b></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if results and total_votes > 0 %}
+        <div class="alert alert-success mt-3">
+            Winner: <b>{{ results[0].full_name }}</b> with <b>{{ results[0].total_votes }}</b> votes.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

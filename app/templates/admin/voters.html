@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Voter Management</h2>
+            <p class="text-muted">Approve, reject, block, and manage voter accounts.</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary">Back</a>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <h5>Registered Voters</h5>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>User</th>
+                        <th>Contact</th>
+                        <th>Voter Details</th>
+                        <th>Verification</th>
+                        <th>Account</th>
+                        <th width="260">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if voters %}
+                        {% for voter in voters %}
+                        <tr>
+                            <td>
+                                <b>{{ voter.full_name }}</b><br>
+                                <small>User ID: {{ voter.user_id }}</small><br>
+                                {% if voter.voter_uid %}
+                                    <small>Voter UID: {{ voter.voter_uid }}</small>
+                                {% else %}
+                                    <small class="text-danger">Profile not completed</small>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ voter.email }}<br>
+                                <small>{{ voter.phone }}</small>
+                            </td>
+
+                            <td>
+                                {% if voter.voter_id %}
+                                    DOB: {{ voter.date_of_birth }}<br>
+                                    Gender: {{ voter.gender }}<br>
+                                    ID: {{ voter.id_type }} - {{ voter.id_number }}<br>
+                                    <small>{{ voter.address }}</small>
+                                {% else %}
+                                    <span class="text-muted">No voter profile submitted</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if voter.verification_status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif voter.verification_status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% elif voter.verification_status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Submitted</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if voter.status == 'active' %}
+                                    <span class="badge bg-success">Active</span>
+                                {% elif voter.status == 'blocked' %}
+                                    <span class="badge bg-danger">Blocked</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">{{ voter.status }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if voter.voter_id %}
+                                    <a href="{{ url_for('admin.approve_voter', voter_id=voter.voter_id) }}" class="btn btn-sm btn-success">Approve</a>
+                                    <a href="{{ url_for('admin.reject_voter', voter_id=voter.voter_id) }}" class="btn btn-sm btn-warning">Reject</a>
+                                {% endif %}
+
+                                {% if voter.status == 'blocked' %}
+                                    <a href="{{ url_for('admin.activate_voter', user_id=voter.user_id) }}" class="btn btn-sm btn-primary mt-1">Activate</a>
+                                {% else %}
+                                    <a href="{{ url_for('admin.block_voter', user_id=voter.user_id) }}" class="btn btn-sm btn-danger mt-1">Block</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No voters found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

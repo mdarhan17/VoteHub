@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Assign Candidates</h2>
+            <p class="text-muted">
+                Election: <b>{{ election.title }}</b>
+            </p>
+        </div>
+        <a href="{{ url_for('election.elections') }}" class="btn btn-outline-primary">Back to Elections</a>
+    </div>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <h5>Assign Candidate to Election</h5>
+
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-9">
+                    <select name="candidate_id" class="form-control" required>
+                        <option value="">Select Candidate</option>
+                        {% for candidate in candidates %}
+                            <option value="{{ candidate.candidate_id }}">
+                                {{ candidate.full_name }} - {{ candidate.party_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100">Assign Candidate</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <h5>Assigned Candidates</h5>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Candidate</th>
+                        <th>Party</th>
+                        <th>Symbol</th>
+                        <th width="120">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if assigned_candidates %}
+                        {% for item in assigned_candidates %}
+                        <tr>
+                            <td>{{ item.candidate_id }}</td>
+                            <td>{{ item.full_name }}</td>
+                            <td>{{ item.party_name }}</td>
+                            <td>{{ item.symbol }}</td>
+                            <td>
+                                <a href="{{ url_for('election.remove_candidate', assign_id=item.id, election_id=election.election_id) }}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Remove this candidate from election?')">
+                                   Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No candidates assigned yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

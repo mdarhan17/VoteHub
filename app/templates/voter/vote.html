@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mb-4">
+        <h2 class="fw-bold">{{ election.title }}</h2>
+        <p class="text-muted">{{ election.description }}</p>
+    </div>
+
+    {% if existing_vote %}
+        <div class="alert alert-success">
+            You have already cast your vote in this election.
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% if candidates %}
+            {% for candidate in candidates %}
+            <div class="col-md-4">
+                <div class="card shadow-sm p-4 h-100">
+                    <h5>{{ candidate.full_name }}</h5>
+                    <p class="text-muted mb-1">{{ candidate.party_name }}</p>
+                    <p>{{ candidate.description }}</p>
+
+                    {% if not existing_vote %}
+                    <form method="POST" action="{{ url_for('vote.cast_vote') }}">
+                        <input type="hidden" name="election_id" value="{{ election.election_id }}">
+                        <input type="hidden" name="candidate_id" value="{{ candidate.candidate_id }}">
+                        <button class="btn btn-primary w-100" onclick="return confirm('Confirm your vote for {{ candidate.full_name }}?')">
+                            Cast Vote
+                        </button>
+                    </form>
+                    {% else %}
+                        <button class="btn btn-secondary w-100" disabled>Voting Completed</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <div class="alert alert-warning">No candidates assigned to this election.</div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

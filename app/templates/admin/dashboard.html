@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Admin Dashboard</h2>
+        <p>Monitor elections, voters, candidates, and voting activity.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="stat-card blue">
+            <div>
+                <p>Total Voters</p>
+                <h3>{{ stats.total_voters }}</h3>
+            </div>
+            <i class="bi bi-people"></i>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card purple">
+            <div>
+                <p>Total Elections</p>
+                <h3>{{ stats.total_elections }}</h3>
+            </div>
+            <i class="bi bi-calendar-event"></i>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card green">
+            <div>
+                <p>Candidates</p>
+                <h3>{{ stats.total_candidates }}</h3>
+            </div>
+            <i class="bi bi-person-badge"></i>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card orange">
+            <div>
+                <p>Votes Cast</p>
+                <h3>{{ stats.total_votes }}</h3>
+            </div>
+            <i class="bi bi-check2-square"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-md-8">
+        <div class="panel-card">
+            <h5>Quick Actions</h5>
+            <div class="quick-actions">
+                <a href="{{ url_for('admin.voters') }}">Manage Voters</a>
+                <a href="{{ url_for('candidate.candidates') }}">Manage Candidates</a>
+                <a href="{{ url_for('election.elections') }}">Manage Elections</a>
+                <a href="{{ url_for('result.results') }}">View Results</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel-card warning-panel">
+            <h5>Pending Approvals</h5>
+            <h2>{{ stats.pending_voters }}</h2>
+            <p>Voters waiting for verification.</p>
+            <a href="{{ url_for('admin.voters') }}" class="btn btn-warning btn-sm">Review Now</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

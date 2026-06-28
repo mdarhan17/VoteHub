@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>{{ election.title }} - Results</h2>
+        <p>Total Votes Cast: <b>{{ total_votes }}</b></p>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5>Candidate-wise Vote Count</h5>
+
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('result.export_pdf', election_id=election.election_id) }}" class="btn btn-danger btn-sm">
+                Download PDF
+            </a>
+
+            <a href="{{ url_for('result.export_excel', election_id=election.election_id) }}" class="btn btn-success btn-sm">
+                Download Excel
+            </a>
+
+            <a href="{{ url_for('result.results') }}" class="btn btn-outline-primary btn-sm">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Rank</th>
+                    <th>Candidate</th>
+                    <th>Party</th>
+                    <th>Total Votes</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if results %}
+                    {% for item in results %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ item.full_name }}</td>
+                        <td>{{ item.party_name }}</td>
+                        <td><b>{{ item.total_votes }}</b></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No result data found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if results and total_votes > 0 %}
+        <div class="alert alert-success mt-3">
+            Winner: <b>{{ results[0].full_name }}</b> with <b>{{ results[0].total_votes }}</b> votes.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

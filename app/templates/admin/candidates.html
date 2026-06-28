@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Candidate Management</h2>
+        <p>Add, edit, upload candidate photo, party symbol, and manifesto PDF.</p>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <h5>Add New Candidate</h5>
+
+    <form method="POST" action="{{ url_for('candidate.add_candidate') }}" enctype="multipart/form-data">
+        <div class="row g-3 mt-2">
+            <div class="col-md-4">
+                <label class="form-label">Candidate Name</label>
+                <input type="text" name="full_name" class="form-control" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Party Name</label>
+                <input type="text" name="party_name" class="form-control">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Candidate Photo</label>
+                <input type="file" name="photo" class="form-control" accept="image/*">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Party Symbol</label>
+                <input type="file" name="symbol" class="form-control" accept="image/*">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Manifesto PDF</label>
+                <input type="file" name="manifesto_file" class="form-control" accept="application/pdf">
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-primary w-100">Add Candidate</button>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row g-4">
+    {% if candidates %}
+        {% for candidate in candidates %}
+        <div class="col-md-4">
+            <div class="candidate-card">
+                <div class="candidate-image">
+                    {% if candidate.photo %}
+                        <img src="{{ url_for('static', filename='images/candidates/' ~ candidate.photo) }}">
+                    {% else %}
+                        <div class="placeholder-img">No Photo</div>
+                    {% endif %}
+                </div>
+
+                <div class="candidate-body">
+                    <h5>{{ candidate.full_name }}</h5>
+                    <p class="party">{{ candidate.party_name }}</p>
+
+                    {% if candidate.symbol %}
+                        <img class="symbol-img" src="{{ url_for('static', filename='images/candidates/' ~ candidate.symbol) }}">
+                    {% endif %}
+
+                    <p class="desc">{{ candidate.description }}</p>
+
+                    {% if candidate.manifesto_file %}
+                        <a href="{{ url_for('static', filename='uploads/manifestos/' ~ candidate.manifesto_file) }}" target="_blank" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                            View Manifesto
+                        </a>
+                    {% endif %}
+
+                    <button class="btn btn-sm btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editCandidate{{ candidate.candidate_id }}">
+                        Edit Candidate
+                    </button>
+
+                    <a href="{{ url_for('candidate.delete_candidate', candidate_id=candidate.candidate_id) }}"
+                       class="btn btn-sm btn-danger w-100"
+                       onclick="return confirm('Delete this candidate?')">
+                       Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editCandidate{{ candidate.candidate_id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form method="POST" action="{{ url_for('candidate.edit_candidate', candidate_id=candidate.candidate_id) }}" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Candidate</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Candidate Name</label>
+                                    <input type="text" name="full_name" value="{{ candidate.full_name }}" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Party Name</label>
+                                    <input type="text" name="party_name" value="{{ candidate.party_name }}" class="form-control">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">New Photo</label>
+                                    <input type="file" name="photo" class="form-control" accept="image/*">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">New Symbol</label>
+                                    <input type="file" name="symbol" class="form-control" accept="image/*">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">New Manifesto PDF</label>
+                                    <input type="file" name="manifesto_file" class="form-control" accept="application/pdf">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" class="form-control" rows="4">{{ candidate.description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Update Candidate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-12">
+            <div class="panel-card text-center text-muted">No candidates found.</div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

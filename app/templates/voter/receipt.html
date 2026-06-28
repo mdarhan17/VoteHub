@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm p-5 text-center">
+                <h2 class="text-success fw-bold">Vote Cast Successfully</h2>
+                <p class="text-muted">Your vote has been securely recorded.</p>
+
+                <hr>
+
+                <p><b>Election:</b> {{ receipt.election_title }}</p>
+                <p><b>Candidate:</b> {{ receipt.candidate_name }}</p>
+                <p><b>Party:</b> {{ receipt.party_name }}</p>
+                <p><b>Receipt Code:</b> {{ receipt.receipt_code }}</p>
+                <p><b>Vote Hash:</b><br><small>{{ receipt.vote_hash }}</small></p>
+                <p><b>Voted At:</b> {{ receipt.voted_at }}</p>
+
+                <a href="{{ url_for('voter.dashboard') }}" class="btn btn-primary mt-3">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

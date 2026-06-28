@@ -1,0 +1,9 @@
+Flask
+Flask-MySQLdb
+python-dotenv
+bcrypt
+email-validator
+qrcode
+pillow
+reportlab
+openpyxl

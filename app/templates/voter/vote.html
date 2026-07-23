@@ -1,46 +1,179 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="mb-4">
-        <h2 class="fw-bold">{{ election.title }}</h2>
-        <p class="text-muted">{{ election.description }}</p>
+<div class="vote-page">
+    <div class="vote-page-header">
+        <div>
+            <a href="{{ url_for('voter.dashboard') }}"
+               class="back-dashboard-link">
+                <i class="bi bi-arrow-left"></i>
+                Back to Dashboard
+            </a>
+
+            <span class="eyebrow">Secure Ballot</span>
+            <h2>{{ election.title }}</h2>
+
+            <p>
+                {{ election.description or
+                'Review the candidates carefully before casting your vote.' }}
+            </p>
+        </div>
+
+        <div class="secure-voting-badge">
+            <i class="bi bi-shield-lock-fill"></i>
+
+            <div>
+                <strong>Secure Voting</strong>
+                <span>One voter, one vote</span>
+            </div>
+        </div>
     </div>
 
     {% if existing_vote %}
-        <div class="alert alert-success">
-            You have already cast your vote in this election.
+    <div class="already-voted-banner">
+        <i class="bi bi-patch-check-fill"></i>
+
+        <div>
+            <h5>Voting Completed</h5>
+            <p>
+                You have already cast your vote in this election.
+                Your vote cannot be changed.
+            </p>
         </div>
+    </div>
     {% endif %}
 
-    <div class="row g-4">
-        {% if candidates %}
-            {% for candidate in candidates %}
-            <div class="col-md-4">
-                <div class="card shadow-sm p-4 h-100">
-                    <h5>{{ candidate.full_name }}</h5>
-                    <p class="text-muted mb-1">{{ candidate.party_name }}</p>
-                    <p>{{ candidate.description }}</p>
+    {% if candidates %}
+    <div class="candidate-grid">
+        {% for candidate in candidates %}
+        <article class="voter-candidate-card">
+            <div class="candidate-cover">
+                {% if candidate.photo %}
+                <img
+                    src="{{ url_for('static', filename='images/candidates/' ~ candidate.photo) }}"
+                    alt="{{ candidate.full_name }}"
+                    class="candidate-main-photo"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
 
-                    {% if not existing_vote %}
-                    <form method="POST" action="{{ url_for('vote.cast_vote') }}">
-                        <input type="hidden" name="election_id" value="{{ election.election_id }}">
-                        <input type="hidden" name="candidate_id" value="{{ candidate.candidate_id }}">
-                        <button class="btn btn-primary w-100" onclick="return confirm('Confirm your vote for {{ candidate.full_name }}?')">
-                            Cast Vote
-                        </button>
-                    </form>
-                    {% else %}
-                        <button class="btn btn-secondary w-100" disabled>Voting Completed</button>
-                    {% endif %}
+                <div class="candidate-photo-fallback"
+                     style="display:none;">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+
+                {% else %}
+                <div class="candidate-photo-fallback">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                {% endif %}
+
+                <div class="candidate-number">
+                    Candidate {{ loop.index }}
                 </div>
             </div>
-            {% endfor %}
-        {% else %}
-            <div class="col-md-12">
-                <div class="alert alert-warning">No candidates assigned to this election.</div>
+
+            <div class="candidate-card-body">
+                <div class="candidate-title-row">
+                    <div>
+                        <h3>{{ candidate.full_name }}</h3>
+
+                        <span class="candidate-party">
+                            {{ candidate.party_name or 'Independent Candidate' }}
+                        </span>
+                    </div>
+
+                    {% if candidate.symbol %}
+                    <div class="candidate-symbol-box"
+                         title="Candidate symbol">
+                        <img
+                            src="{{ url_for('static', filename='images/candidates/' ~ candidate.symbol) }}"
+                            alt="{{ candidate.party_name or candidate.full_name }} symbol"
+                            onerror="this.parentElement.style.display='none';">
+                    </div>
+                    {% else %}
+                    <div class="candidate-symbol-placeholder">
+                        <i class="bi bi-award-fill"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <p class="candidate-description">
+                    {{ candidate.description or
+                    'No candidate description has been provided.' }}
+                </p>
+
+                {% if candidate.manifesto_file %}
+                <a
+                    href="{{ url_for('static', filename='uploads/manifestos/' ~ candidate.manifesto_file) }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="manifesto-link">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                    View Manifesto
+                </a>
+                {% endif %}
+
+                {% if not existing_vote %}
+                <form
+                    method="POST"
+                    action="{{ url_for('vote.cast_vote') }}"
+                    class="vote-form"
+                    onsubmit="return confirmVote('{{ candidate.full_name|e }}');">
+
+                    <input
+                        type="hidden"
+                        name="election_id"
+                        value="{{ election.election_id }}">
+
+                    <input
+                        type="hidden"
+                        name="candidate_id"
+                        value="{{ candidate.candidate_id }}">
+
+                    <button type="submit"
+                            class="cast-vote-button">
+                        <i class="bi bi-check2-circle"></i>
+                        Cast Vote
+                    </button>
+                </form>
+
+                {% else %}
+                <button class="cast-vote-button completed" disabled>
+                    <i class="bi bi-lock-fill"></i>
+                    Voting Completed
+                </button>
+                {% endif %}
             </div>
-        {% endif %}
+        </article>
+        {% endfor %}
     </div>
+
+    {% else %}
+    <div class="empty-election-state">
+        <div class="empty-election-icon">
+            <i class="bi bi-people"></i>
+        </div>
+
+        <h4>No Candidates Assigned</h4>
+
+        <p>
+            The administrator has not assigned any candidates to this
+            election yet.
+        </p>
+
+        <a href="{{ url_for('voter.dashboard') }}"
+           class="btn btn-primary">
+            Return to Dashboard
+        </a>
+    </div>
+    {% endif %}
 </div>
+
+<script>
+function confirmVote(candidateName) {
+    return window.confirm(
+        "Confirm your vote for " + candidateName +
+        "?\n\nOnce submitted, your vote cannot be changed."
+    );
+}
+</script>
 {% endblock %}

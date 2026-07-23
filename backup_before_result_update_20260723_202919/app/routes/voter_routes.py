@@ -1,41 +1,13 @@
-﻿from flask import (
-    Blueprint,
-    render_template,
-    session,
-    request,
-    redirect,
-    url_for,
-    flash
-)
+﻿from flask import Blueprint, render_template, session, request, redirect, url_for, flash
 from app.extensions import mysql
 from app.utils.decorators import voter_required
 
-voter_bp = Blueprint(
-    "voter",
-    __name__,
-    url_prefix="/voter"
-)
-
-
-def synchronize_elections():
-    cur = mysql.connection.cursor()
-
-    cur.execute("""
-        UPDATE elections
-        SET status='completed'
-        WHERE status='active'
-          AND end_datetime <= NOW()
-    """)
-
-    mysql.connection.commit()
-    cur.close()
+voter_bp = Blueprint("voter", __name__, url_prefix="/voter")
 
 
 @voter_bp.route("/dashboard")
 @voter_required
 def dashboard():
-    synchronize_elections()
-
     user_id = session.get("user_id")
     cur = mysql.connection.cursor()
 
@@ -54,10 +26,8 @@ def dashboard():
         LEFT JOIN election_candidates ec
             ON e.election_id = ec.election_id
         WHERE e.status='active'
-          AND e.start_datetime <= NOW()
-          AND e.end_datetime > NOW()
         GROUP BY e.election_id
-        ORDER BY e.end_datetime ASC
+        ORDER BY e.start_datetime DESC
     """)
     active_elections = cur.fetchall()
 
@@ -68,87 +38,8 @@ def dashboard():
             ON v.voter_id = vt.voter_id
         WHERE vt.user_id=%s
     """, (user_id,))
-
-    vote_result = cur.fetchone()
-    total_votes = (
-        vote_result["total"]
-        if vote_result
-        else 0
-    )
-
-    cur.execute("""
-        SELECT
-            e.election_id,
-            e.title,
-            e.description,
-            e.end_datetime,
-            e.result_published,
-            COUNT(v.vote_id) AS total_votes
-        FROM elections e
-        LEFT JOIN votes v
-            ON e.election_id = v.election_id
-        WHERE e.status='completed'
-        GROUP BY e.election_id
-        ORDER BY e.end_datetime DESC
-        LIMIT 12
-    """)
-    completed_elections = cur.fetchall()
-
-    published_results = []
-    unpublished_results = []
-
-    for election in completed_elections:
-        if election["result_published"]:
-            cur.execute("""
-                SELECT
-                    c.candidate_id,
-                    c.full_name,
-                    c.party_name,
-                    c.photo,
-                    c.symbol,
-                    COUNT(v.vote_id) AS votes_received
-                FROM election_candidates ec
-                INNER JOIN candidates c
-                    ON ec.candidate_id = c.candidate_id
-                LEFT JOIN votes v
-                    ON v.election_id = ec.election_id
-                   AND v.candidate_id = c.candidate_id
-                WHERE ec.election_id=%s
-                GROUP BY
-                    c.candidate_id,
-                    c.full_name,
-                    c.party_name,
-                    c.photo,
-                    c.symbol
-                ORDER BY
-                    votes_received DESC,
-                    c.full_name ASC
-            """, (election["election_id"],))
-
-            candidates = cur.fetchall()
-
-            if candidates and election["total_votes"] > 0:
-                highest_votes = candidates[0]["votes_received"]
-
-                winners = [
-                    candidate
-                    for candidate in candidates
-                    if candidate["votes_received"] == highest_votes
-                ]
-
-                published_results.append({
-                    "election": election,
-                    "winners": winners,
-                    "is_tie": len(winners) > 1
-                })
-            else:
-                published_results.append({
-                    "election": election,
-                    "winners": [],
-                    "is_tie": False
-                })
-        else:
-            unpublished_results.append(election)
+    result = cur.fetchone()
+    total_votes = result["total"] if result else 0
 
     cur.close()
 
@@ -156,9 +47,7 @@ def dashboard():
         "voter/dashboard.html",
         voter=voter,
         active_elections=active_elections,
-        total_votes=total_votes,
-        published_results=published_results,
-        unpublished_results=unpublished_results
+        total_votes=total_votes
     )
 
 
@@ -197,12 +86,7 @@ def profile():
             id_number
         ]):
             cur.close()
-
-            flash(
-                "Please fill all voter profile details.",
-                "danger"
-            )
-
+            flash("Please fill all voter profile details.", "danger")
             return redirect(url_for("voter.profile"))
 
         if voter:
@@ -225,10 +109,7 @@ def profile():
                 user_id
             ))
         else:
-            voter_uid = (
-                "VH-VOTER-"
-                + str(user_id).zfill(5)
-            )
+            voter_uid = "VH-VOTER-" + str(user_id).zfill(5)
 
             cur.execute("""
                 INSERT INTO voters
@@ -242,8 +123,7 @@ def profile():
                     id_number,
                     verification_status
                 )
-                VALUES
-                (%s, %s, %s, %s, %s, %s, %s, 'pending')
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 'pending')
             """, (
                 user_id,
                 voter_uid,
@@ -261,7 +141,6 @@ def profile():
             "Profile submitted successfully. Waiting for admin approval.",
             "success"
         )
-
         return redirect(url_for("voter.dashboard"))
 
     cur.close()

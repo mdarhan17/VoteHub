@@ -5,9 +5,10 @@
     <div>
         <span class="eyebrow">Voter Control Center</span>
         <h2>Voter Dashboard</h2>
+
         <p>
             Welcome, {{ session.get('full_name') }}.
-            View active elections and cast your vote securely.
+            View elections, results and voting activity.
         </p>
     </div>
 
@@ -33,7 +34,7 @@
 {% elif voter.verification_status == 'pending' %}
 <div class="alert alert-info premium-alert">
     <i class="bi bi-hourglass-split me-2"></i>
-    Your profile is submitted and waiting for admin approval.
+    Your profile is waiting for admin approval.
 </div>
 
 {% elif voter.verification_status == 'rejected' %}
@@ -51,7 +52,7 @@
 {% elif voter.verification_status == 'approved' %}
 <div class="alert alert-success premium-alert">
     <i class="bi bi-patch-check-fill me-2"></i>
-    Your voter profile is approved. You may participate in active elections.
+    Your voter profile is approved.
 </div>
 {% endif %}
 
@@ -84,11 +85,11 @@
     <div class="col-xl-4 col-md-6">
         <div class="stat-card purple">
             <div>
-                <p>Active Elections</p>
+                <p>Voting Live</p>
                 <h3>{{ active_elections|length }}</h3>
             </div>
 
-            <i class="bi bi-calendar-event"></i>
+            <i class="bi bi-broadcast"></i>
         </div>
     </div>
 </div>
@@ -97,11 +98,11 @@
     <div class="panel-heading">
         <div>
             <span class="eyebrow">Voting Opportunities</span>
-            <h5>Available Elections</h5>
+            <h5>Live Elections</h5>
         </div>
 
         <span class="election-total">
-            {{ active_elections|length }} Active
+            {{ active_elections|length }} Live
         </span>
     </div>
 
@@ -116,7 +117,7 @@
 
                 <span class="active-election-badge">
                     <span></span>
-                    Active
+                    Voting Live
                 </span>
             </div>
 
@@ -132,7 +133,8 @@
                     <i class="bi bi-people-fill"></i>
 
                     <span>
-                        {{ election.candidate_count }} Candidate{% if election.candidate_count != 1 %}s{% endif %}
+                        {{ election.candidate_count }}
+                        Candidate{% if election.candidate_count != 1 %}s{% endif %}
                     </span>
                 </div>
 
@@ -140,15 +142,17 @@
                     <i class="bi bi-calendar-check"></i>
 
                     <span>
-                        {{ election.start_datetime.strftime('%d %b %Y, %I:%M %p') if election.start_datetime else 'Not specified' }}
+                        Starts:
+                        {{ election.start_datetime.strftime('%d %b %Y, %I:%M %p') }}
                     </span>
                 </div>
 
                 <div>
-                    <i class="bi bi-calendar-x"></i>
+                    <i class="bi bi-hourglass-bottom"></i>
 
                     <span>
-                        {{ election.end_datetime.strftime('%d %b %Y, %I:%M %p') if election.end_datetime else 'Not specified' }}
+                        Closes:
+                        {{ election.end_datetime.strftime('%d %b %Y, %I:%M %p') }}
                     </span>
                 </div>
             </div>
@@ -161,13 +165,15 @@
             </a>
 
             {% elif voter.verification_status != 'approved' %}
-            <button class="election-action disabled" disabled>
+            <button class="election-action disabled"
+                    disabled>
                 <i class="bi bi-lock-fill"></i>
                 Approval Required
             </button>
 
             {% elif election.candidate_count == 0 %}
-            <button class="election-action disabled" disabled>
+            <button class="election-action disabled"
+                    disabled>
                 <i class="bi bi-person-x-fill"></i>
                 No Candidates Assigned
             </button>
@@ -186,15 +192,401 @@
     {% else %}
     <div class="empty-election-state">
         <div class="empty-election-icon">
-            <i class="bi bi-calendar2-x"></i>
+            <i class="bi bi-lock-fill"></i>
         </div>
 
-        <h4>No Active Elections</h4>
+        <h4>Voting is Closed</h4>
 
         <p>
-            There are currently no active elections available for voting.
+            There are currently no elections open for voting.
         </p>
     </div>
     {% endif %}
 </div>
+
+<div class="panel-card mt-4">
+    <div class="panel-heading">
+        <div>
+            <span class="eyebrow">Official Results</span>
+            <h5>Published Election Results</h5>
+        </div>
+
+        <span class="election-total">
+            {{ published_results|length }} Published
+        </span>
+    </div>
+
+    {% if published_results %}
+    <div class="row g-4">
+        {% for result in published_results %}
+            {% if result.winners %}
+                {% if result.is_tie %}
+                <div class="col-12">
+                    <div class="voter-result-card tie-result-card">
+                        <div class="voter-result-trophy">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+
+                        <div>
+                            <span class="result-election-name">
+                                {{ result.election.title }}
+                            </span>
+
+                            <h3>Result is a Tie</h3>
+
+                            <p class="text-muted">
+                                The following candidates received the
+                                highest number of votes.
+                            </p>
+
+                            <div class="row g-3 mt-1">
+                                {% for winner in result.winners %}
+                                <div class="col-md-4">
+                                    <div class="tie-winner-item">
+                                        {% if winner.photo %}
+                                        <img src="{{ url_for('static', filename='images/candidates/' ~ winner.photo) }}"
+                                             alt="{{ winner.full_name }}">
+                                        {% else %}
+                                        <div class="result-photo-placeholder">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        {% endif %}
+
+                                        <strong>{{ winner.full_name }}</strong>
+
+                                        <span>
+                                            {{ winner.party_name or 'Independent' }}
+                                        </span>
+
+                                        <b>
+                                            {{ winner.votes_received }}
+                                            out of
+                                            {{ result.election.total_votes }}
+                                        </b>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% else %}
+                    {% set winner = result.winners[0] %}
+
+                    <div class="col-lg-6">
+                        <div class="voter-result-card">
+                            <div class="voter-result-trophy">
+                                <i class="bi bi-trophy-fill"></i>
+                            </div>
+
+                            <div class="voter-result-photo">
+                                {% if winner.photo %}
+                                <img src="{{ url_for('static', filename='images/candidates/' ~ winner.photo) }}"
+                                     alt="{{ winner.full_name }}">
+                                {% else %}
+                                <div class="result-photo-placeholder">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="voter-result-content">
+                                <span class="result-election-name">
+                                    {{ result.election.title }}
+                                </span>
+
+                                <small class="winner-announcement">
+                                    Winner
+                                </small>
+
+                                <h3>{{ winner.full_name }}</h3>
+
+                                <p>
+                                    {{ winner.party_name or 'Independent Candidate' }}
+                                </p>
+
+                                <div class="result-score">
+                                    <strong>
+                                        {{ winner.votes_received }}
+                                    </strong>
+
+                                    <span>
+                                        votes out of
+                                        {{ result.election.total_votes }}
+                                    </span>
+                                </div>
+
+                                {% if result.election.total_votes > 0 %}
+                                <small class="text-muted">
+                                    {{ (winner.votes_received / result.election.total_votes * 100)|round(1) }}%
+                                    of total votes
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+            <div class="col-lg-6">
+                <div class="voter-result-card no-result-card">
+                    <div class="voter-result-trophy">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </div>
+
+                    <div>
+                        <span class="result-election-name">
+                            {{ result.election.title }}
+                        </span>
+
+                        <h4>No Winner Available</h4>
+
+                        <p class="mb-0">
+                            No votes were recorded for this election.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-election-state py-4">
+        <div class="empty-election-icon">
+            <i class="bi bi-trophy"></i>
+        </div>
+
+        <h4>No Published Results</h4>
+
+        <p>
+            Election winners will appear here after the administrator
+            publishes the result.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+{% if unpublished_results %}
+<div class="panel-card mt-4">
+    <div class="panel-heading">
+        <div>
+            <span class="eyebrow">Completed Elections</span>
+            <h5>Results Awaiting Publication</h5>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% for election in unpublished_results %}
+        <div class="col-lg-6">
+            <div class="result-pending-card">
+                <div>
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+
+                <section>
+                    <h5>{{ election.title }}</h5>
+
+                    <p>
+                        Result not published yet.
+                    </p>
+
+                    <small>
+                        Voting closed on
+                        {{ election.end_datetime.strftime('%d %b %Y, %I:%M %p') }}
+                    </small>
+                </section>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<style>
+.voter-result-card {
+    position: relative;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 115px 1fr;
+    gap: 22px;
+    align-items: center;
+    overflow: hidden;
+    padding: 25px;
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at top right, #fef3c7, transparent 48%),
+        linear-gradient(135deg, #ffffff, #fffbeb);
+    box-shadow: 0 20px 45px rgba(146,64,14,0.1);
+}
+
+.voter-result-trophy {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    color: rgba(245,158,11,0.22);
+    font-size: 62px;
+}
+
+.voter-result-photo {
+    position: relative;
+    z-index: 2;
+}
+
+.voter-result-photo img,
+.result-photo-placeholder {
+    width: 112px;
+    height: 112px;
+    border: 5px solid white;
+    border-radius: 50%;
+    box-shadow: 0 12px 28px rgba(15,23,42,0.14);
+}
+
+.voter-result-photo img {
+    object-fit: cover;
+    object-position: top;
+}
+
+.result-photo-placeholder {
+    display: grid;
+    place-items: center;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 44px;
+}
+
+.voter-result-content {
+    position: relative;
+    z-index: 2;
+}
+
+.result-election-name {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+.winner-announcement {
+    display: inline-block;
+    margin: 8px 0;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.voter-result-content h3 {
+    margin-bottom: 4px;
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.voter-result-content p {
+    color: #2563eb;
+    font-weight: 750;
+}
+
+.result-score strong {
+    color: #16a34a;
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.result-score span {
+    color: #64748b;
+    font-weight: 650;
+}
+
+.tie-result-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+}
+
+.tie-winner-item {
+    height: 100%;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.9);
+}
+
+.tie-winner-item img,
+.tie-winner-item .result-photo-placeholder {
+    width: 85px;
+    height: 85px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+}
+
+.tie-winner-item strong,
+.tie-winner-item span,
+.tie-winner-item b {
+    display: block;
+}
+
+.tie-winner-item span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.tie-winner-item b {
+    margin-top: 7px;
+    color: #16a34a;
+}
+
+.result-pending-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 100%;
+    padding: 20px;
+    border: 1px solid rgba(148,163,184,.22);
+    border-radius: 18px;
+    background: #f8fafc;
+}
+
+.result-pending-card > div {
+    width: 55px;
+    height: 55px;
+    display: grid;
+    flex: 0 0 55px;
+    place-items: center;
+    border-radius: 16px;
+    background: #fef3c7;
+    color: #d97706;
+    font-size: 24px;
+}
+
+.result-pending-card h5,
+.result-pending-card p {
+    margin-bottom: 3px;
+}
+
+.result-pending-card p {
+    color: #d97706;
+    font-weight: 800;
+}
+
+.result-pending-card small {
+    color: #64748b;
+}
+
+@media (max-width: 576px) {
+    .voter-result-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .voter-result-photo {
+        margin: auto;
+    }
+}
+</style>
 {% endblock %}

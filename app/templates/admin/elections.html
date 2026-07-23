@@ -1,54 +1,104 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block content %}
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
+            <span class="eyebrow">Administration</span>
             <h2 class="fw-bold">Election Management</h2>
-            <p class="text-muted">Create, manage, and assign candidates to elections.</p>
+            <p class="text-muted">
+                Create elections, configure timings and assign candidates.
+            </p>
         </div>
-        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary">Back</a>
+
+        <a href="{{ url_for('admin.dashboard') }}"
+           class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
     </div>
 
-    <div class="card shadow-sm p-4 mb-4">
-        <h5>Create New Election</h5>
+    <div class="card shadow-sm p-4 mb-4 border-0 rounded-4">
+        <h5 class="fw-bold mb-3">Create New Election</h5>
 
-        <form method="POST" action="{{ url_for('election.add_election') }}">
+        <form method="POST"
+              action="{{ url_for('election.add_election') }}">
+
             <div class="row g-3">
                 <div class="col-md-4">
-                    <input type="text" name="title" class="form-control" placeholder="Election Title" required>
+                    <label class="form-label fw-semibold">
+                        Election Title
+                    </label>
+
+                    <input type="text"
+                           name="title"
+                           class="form-control"
+                           placeholder="Election Title"
+                           required>
                 </div>
 
                 <div class="col-md-4">
-                    <input type="datetime-local" name="start_datetime" class="form-control" required>
+                    <label class="form-label fw-semibold">
+                        Voting Start Time
+                    </label>
+
+                    <input type="datetime-local"
+                           name="start_datetime"
+                           class="form-control"
+                           required>
                 </div>
 
                 <div class="col-md-4">
-                    <input type="datetime-local" name="end_datetime" class="form-control" required>
+                    <label class="form-label fw-semibold">
+                        Voting End Time
+                    </label>
+
+                    <input type="datetime-local"
+                           name="end_datetime"
+                           class="form-control"
+                           required>
                 </div>
 
                 <div class="col-md-12">
-                    <textarea name="description" class="form-control" rows="3" placeholder="Election Description"></textarea>
+                    <label class="form-label fw-semibold">
+                        Description
+                    </label>
+
+                    <textarea name="description"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Election Description"></textarea>
                 </div>
 
                 <div class="col-md-12">
-                    <button class="btn btn-primary">Create Election</button>
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        Create Election
+                    </button>
                 </div>
             </div>
         </form>
     </div>
 
-    <div class="card shadow-sm p-4">
-        <h5>Election List</h5>
+    <div class="card shadow-sm p-4 border-0 rounded-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">Election List</h5>
+
+            <span class="badge bg-primary">
+                {{ elections|length }} Elections
+            </span>
+        </div>
 
         <div class="table-responsive mt-3">
             <table class="table table-bordered align-middle">
                 <thead class="table-primary">
                     <tr>
                         <th>ID</th>
-                        <th>Title</th>
+                        <th>Election</th>
                         <th>Start</th>
                         <th>End</th>
+                        <th>Candidates</th>
                         <th>Status</th>
                         <th width="360">Actions</th>
                     </tr>
@@ -59,32 +109,114 @@
                         {% for election in elections %}
                         <tr>
                             <td>{{ election.election_id }}</td>
+
                             <td>
-                                <b>{{ election.title }}</b><br>
-                                <small class="text-muted">{{ election.description }}</small>
+                                <b>{{ election.title }}</b>
+                                <br>
+
+                                <small class="text-muted">
+                                    {{ election.description or 'No description' }}
+                                </small>
                             </td>
-                            <td>{{ election.start_datetime }}</td>
-                            <td>{{ election.end_datetime }}</td>
+
                             <td>
-                                {% if election.status == 'active' %}
-                                    <span class="badge bg-success">Active</span>
+                                {{ election.start_datetime.strftime('%d %b %Y') }}
+                                <br>
+
+                                <small class="text-muted">
+                                    {{ election.start_datetime.strftime('%I:%M %p') }}
+                                </small>
+                            </td>
+
+                            <td>
+                                {{ election.end_datetime.strftime('%d %b %Y') }}
+                                <br>
+
+                                <small class="text-muted">
+                                    {{ election.end_datetime.strftime('%I:%M %p') }}
+                                </small>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    {{ election.candidate_count }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if election.timing_status == 'closed' %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-lock-fill"></i>
+                                        Voting Closed
+                                    </span>
+
+                                {% elif election.timing_status == 'upcoming' %}
+                                    <span class="badge bg-info text-dark">
+                                        <i class="bi bi-clock"></i>
+                                        Upcoming
+                                    </span>
+
+                                {% elif election.timing_status == 'live' %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-broadcast"></i>
+                                        Voting Live
+                                    </span>
+
                                 {% elif election.status == 'completed' %}
-                                    <span class="badge bg-secondary">Completed</span>
+                                    <span class="badge bg-secondary">
+                                        Completed
+                                    </span>
+
                                 {% else %}
-                                    <span class="badge bg-warning text-dark">Draft</span>
+                                    <span class="badge bg-warning text-dark">
+                                        Draft
+                                    </span>
                                 {% endif %}
                             </td>
+
                             <td>
-                                <a href="{{ url_for('election.assign_candidates', election_id=election.election_id) }}" class="btn btn-sm btn-primary">Assign</a>
-                                <a href="{{ url_for('election.activate_election', election_id=election.election_id) }}" class="btn btn-sm btn-success">Activate</a>
-                                <a href="{{ url_for('election.complete_election', election_id=election.election_id) }}" class="btn btn-sm btn-secondary">Complete</a>
-                                <a href="{{ url_for('election.delete_election', election_id=election.election_id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this election?')">Delete</a>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <a href="{{ url_for('election.assign_candidates', election_id=election.election_id) }}"
+                                       class="btn btn-sm btn-primary">
+                                        Assign
+                                    </a>
+
+                                    {% if election.timing_status != 'closed'
+                                          and election.status != 'completed' %}
+                                    <a href="{{ url_for('election.activate_election', election_id=election.election_id) }}"
+                                       class="btn btn-sm btn-success">
+                                        Activate
+                                    </a>
+                                    {% endif %}
+
+                                    {% if election.status != 'completed' %}
+                                    <a href="{{ url_for('election.complete_election', election_id=election.election_id) }}"
+                                       class="btn btn-sm btn-secondary"
+                                       onclick="return confirm('Close voting for this election?')">
+                                        Complete
+                                    </a>
+                                    {% endif %}
+
+                                    <a href="{{ url_for('result.election_result', election_id=election.election_id) }}"
+                                       class="btn btn-sm btn-info">
+                                        Result
+                                    </a>
+
+                                    <a href="{{ url_for('election.delete_election', election_id=election.election_id) }}"
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Delete this election?')">
+                                        Delete
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted">No elections found.</td>
+                            <td colspan="7"
+                                class="text-center text-muted py-4">
+                                No elections found.
+                            </td>
                         </tr>
                     {% endif %}
                 </tbody>

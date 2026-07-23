@@ -1,0 +1,200 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <span class="eyebrow">Voter Control Center</span>
+        <h2>Voter Dashboard</h2>
+        <p>
+            Welcome, {{ session.get('full_name') }}.
+            View active elections and cast your vote securely.
+        </p>
+    </div>
+
+    <a href="{{ url_for('voter.history') }}"
+       class="btn btn-outline-primary">
+        <i class="bi bi-clock-history"></i>
+        Vote History
+    </a>
+</div>
+
+{% if not voter %}
+<div class="alert alert-warning premium-alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+    Your voter profile is incomplete.
+
+    <a href="{{ url_for('voter.profile') }}"
+       class="alert-link">
+        Complete profile now
+    </a>
+</div>
+
+{% elif voter.verification_status == 'pending' %}
+<div class="alert alert-info premium-alert">
+    <i class="bi bi-hourglass-split me-2"></i>
+    Your profile is submitted and waiting for admin approval.
+</div>
+
+{% elif voter.verification_status == 'rejected' %}
+<div class="alert alert-danger premium-alert">
+    <i class="bi bi-x-circle-fill me-2"></i>
+
+    Your profile was rejected.
+
+    <a href="{{ url_for('voter.profile') }}"
+       class="alert-link">
+        Update profile
+    </a>
+</div>
+
+{% elif voter.verification_status == 'approved' %}
+<div class="alert alert-success premium-alert">
+    <i class="bi bi-patch-check-fill me-2"></i>
+    Your voter profile is approved. You may participate in active elections.
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card blue">
+            <div>
+                <p>Verification</p>
+
+                <h3>
+                    {{ voter.verification_status|capitalize if voter else 'Incomplete' }}
+                </h3>
+            </div>
+
+            <i class="bi bi-shield-check"></i>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card green">
+            <div>
+                <p>Votes Cast</p>
+                <h3>{{ total_votes }}</h3>
+            </div>
+
+            <i class="bi bi-check2-square"></i>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card purple">
+            <div>
+                <p>Active Elections</p>
+                <h3>{{ active_elections|length }}</h3>
+            </div>
+
+            <i class="bi bi-calendar-event"></i>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card mt-4">
+    <div class="panel-heading">
+        <div>
+            <span class="eyebrow">Voting Opportunities</span>
+            <h5>Available Elections</h5>
+        </div>
+
+        <span class="election-total">
+            {{ active_elections|length }} Active
+        </span>
+    </div>
+
+    {% if active_elections %}
+    <div class="voter-election-grid">
+        {% for election in active_elections %}
+        <div class="voter-election-card">
+            <div class="election-card-top">
+                <div class="election-icon">
+                    <i class="bi bi-bank2"></i>
+                </div>
+
+                <span class="active-election-badge">
+                    <span></span>
+                    Active
+                </span>
+            </div>
+
+            <h4>{{ election.title }}</h4>
+
+            <p>
+                {{ election.description or
+                'Participate securely in this election through VoteHub.' }}
+            </p>
+
+            <div class="election-meta">
+                <div>
+                    <i class="bi bi-people-fill"></i>
+
+                    <span>
+                        {{ election.candidate_count }} Candidate{% if election.candidate_count != 1 %}s{% endif %}
+                    </span>
+                </div>
+
+                <div>
+                    <i class="bi bi-calendar-check"></i>
+
+                    <span>
+                        {{ election.start_datetime.strftime('%d %b %Y, %I:%M %p') if election.start_datetime else 'Not specified' }}
+                    </span>
+                </div>
+
+                <div>
+                    <i class="bi bi-calendar-x"></i>
+
+                    <span>
+                        {{ election.end_datetime.strftime('%d %b %Y, %I:%M %p') if election.end_datetime else 'Not specified' }}
+                    </span>
+                </div>
+            </div>
+
+            {% if not voter %}
+            <a href="{{ url_for('voter.profile') }}"
+               class="election-action warning">
+                <i class="bi bi-person-fill-add"></i>
+                Complete Profile
+            </a>
+
+            {% elif voter.verification_status != 'approved' %}
+            <button class="election-action disabled" disabled>
+                <i class="bi bi-lock-fill"></i>
+                Approval Required
+            </button>
+
+            {% elif election.candidate_count == 0 %}
+            <button class="election-action disabled" disabled>
+                <i class="bi bi-person-x-fill"></i>
+                No Candidates Assigned
+            </button>
+
+            {% else %}
+            <a href="{{ url_for('vote.election_details', election_id=election.election_id) }}"
+               class="election-action">
+                View Candidates
+                <i class="bi bi-arrow-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-election-state">
+        <div class="empty-election-icon">
+            <i class="bi bi-calendar2-x"></i>
+        </div>
+
+        <h4>No Active Elections</h4>
+
+        <p>
+            There are currently no active elections available for voting.
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,28 +1,160 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h2>{{ election.title }} - Results</h2>
-        <p>Total Votes Cast: <b>{{ total_votes }}</b></p>
+        <span class="eyebrow">Election Result</span>
+        <h2>{{ election.title }}</h2>
+
+        <p>
+            Total Votes Cast:
+            <b>{{ total_votes }}</b>
+        </p>
     </div>
+
+    <a href="{{ url_for('result.results') }}"
+       class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left"></i>
+        Back
+    </a>
 </div>
 
-<div class="panel-card mb-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5>Candidate-wise Vote Count</h5>
+{% if winners %}
+    {% if is_tie %}
+    <div class="winner-section tie-section">
+        <div class="winner-trophy">
+            <i class="bi bi-trophy-fill"></i>
+        </div>
 
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('result.export_pdf', election_id=election.election_id) }}" class="btn btn-danger btn-sm">
+        <span class="winner-label">Election Result</span>
+        <h2>Result is a Tie</h2>
+
+        <p class="text-muted">
+            {{ winners|length }} candidates received the highest number
+            of votes.
+        </p>
+
+        <div class="row g-4 mt-2">
+            {% for winner in winners %}
+            <div class="col-lg-4 col-md-6">
+                <div class="winner-candidate-card">
+                    {% if winner.photo %}
+                    <img src="{{ url_for('static', filename='images/candidates/' ~ winner.photo) }}"
+                         alt="{{ winner.full_name }}"
+                         class="winner-photo">
+                    {% else %}
+                    <div class="winner-photo-placeholder">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    {% endif %}
+
+                    <h4>{{ winner.full_name }}</h4>
+
+                    <p class="winner-party">
+                        {{ winner.party_name or 'Independent' }}
+                    </p>
+
+                    <div class="winner-score">
+                        {{ winner.total_votes }}
+                        <span>out of {{ total_votes }} votes</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% else %}
+        {% set winner = winners[0] %}
+
+        <div class="winner-section">
+            <div class="winner-trophy">
+                <i class="bi bi-trophy-fill"></i>
+            </div>
+
+            <span class="winner-label">Election Winner</span>
+
+            <div class="winner-main-card">
+                <div class="winner-image-area">
+                    {% if winner.photo %}
+                    <img src="{{ url_for('static', filename='images/candidates/' ~ winner.photo) }}"
+                         alt="{{ winner.full_name }}"
+                         class="winner-main-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                    <div class="winner-main-placeholder"
+                         style="display:none;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    {% else %}
+                    <div class="winner-main-placeholder">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="winner-content">
+                    <h2>{{ winner.full_name }}</h2>
+
+                    <p class="winner-party">
+                        {{ winner.party_name or 'Independent Candidate' }}
+                    </p>
+
+                    <div class="winner-vote-count">
+                        <strong>{{ winner.total_votes }}</strong>
+
+                        <span>
+                            votes received out of {{ total_votes }}
+                            total votes
+                        </span>
+                    </div>
+
+                    {% if total_votes > 0 %}
+                    <div class="progress mt-3"
+                         style="height: 12px;">
+                        <div class="progress-bar bg-success"
+                             style="width: {{ (winner.total_votes / total_votes * 100)|round(1) }}%">
+                        </div>
+                    </div>
+
+                    <small class="text-muted">
+                        {{ (winner.total_votes / total_votes * 100)|round(1) }}%
+                        of total votes
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% else %}
+<div class="alert alert-warning">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    No winner is available because no votes have been cast.
+</div>
+{% endif %}
+
+<div class="panel-card mt-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h5 class="mb-1">Candidate-wise Vote Count</h5>
+
+            <small class="text-muted">
+                Complete ranking and vote distribution
+            </small>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('result.export_pdf', election_id=election.election_id) }}"
+               class="btn btn-danger btn-sm">
+                <i class="bi bi-file-earmark-pdf-fill"></i>
                 Download PDF
             </a>
 
-            <a href="{{ url_for('result.export_excel', election_id=election.election_id) }}" class="btn btn-success btn-sm">
+            <a href="{{ url_for('result.export_excel', election_id=election.election_id) }}"
+               class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-excel-fill"></i>
                 Download Excel
-            </a>
-
-            <a href="{{ url_for('result.results') }}" class="btn btn-outline-primary btn-sm">
-                Back
             </a>
         </div>
     </div>
@@ -35,6 +167,7 @@
                     <th>Candidate</th>
                     <th>Party</th>
                     <th>Total Votes</th>
+                    <th>Percentage</th>
                 </tr>
             </thead>
 
@@ -42,25 +175,208 @@
                 {% if results %}
                     {% for item in results %}
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ item.full_name }}</td>
-                        <td>{{ item.party_name }}</td>
-                        <td><b>{{ item.total_votes }}</b></td>
+                        <td>
+                            {% if loop.index == 1 and total_votes > 0 %}
+                                <i class="bi bi-trophy-fill text-warning me-1"></i>
+                            {% endif %}
+
+                            {{ loop.index }}
+                        </td>
+
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if item.photo %}
+                                <img src="{{ url_for('static', filename='images/candidates/' ~ item.photo) }}"
+                                     alt="{{ item.full_name }}"
+                                     width="44"
+                                     height="44"
+                                     class="rounded-circle object-fit-cover">
+                                {% endif %}
+
+                                <b>{{ item.full_name }}</b>
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ item.party_name or 'Independent' }}
+                        </td>
+
+                        <td>
+                            <b>{{ item.total_votes }}</b>
+                            out of {{ total_votes }}
+                        </td>
+
+                        <td>
+                            {% if total_votes > 0 %}
+                                {{ (item.total_votes / total_votes * 100)|round(1) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="4" class="text-center text-muted">No result data found.</td>
+                        <td colspan="5"
+                            class="text-center text-muted py-4">
+                            No result data found.
+                        </td>
                     </tr>
                 {% endif %}
             </tbody>
         </table>
     </div>
-
-    {% if results and total_votes > 0 %}
-        <div class="alert alert-success mt-3">
-            Winner: <b>{{ results[0].full_name }}</b> with <b>{{ results[0].total_votes }}</b> votes.
-        </div>
-    {% endif %}
 </div>
+
+<style>
+.winner-section {
+    padding: 35px;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top, rgba(254, 243, 199, 0.9), transparent 55%),
+        linear-gradient(135deg, #ffffff, #fffbeb);
+    text-align: center;
+    box-shadow: 0 22px 60px rgba(146, 64, 14, 0.12);
+}
+
+.winner-trophy {
+    margin-bottom: 12px;
+    color: #f59e0b;
+    font-size: 76px;
+    line-height: 1;
+    filter: drop-shadow(0 12px 18px rgba(245, 158, 11, 0.3));
+}
+
+.winner-label {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.winner-main-card {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 34px;
+    align-items: center;
+    max-width: 850px;
+    margin: 15px auto 0;
+    padding: 28px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.94);
+    box-shadow: 0 20px 45px rgba(15,23,42,0.1);
+    text-align: left;
+}
+
+.winner-image-area {
+    height: 250px;
+    overflow: hidden;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #dbeafe, #fef3c7);
+}
+
+.winner-main-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.winner-main-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 90px;
+}
+
+.winner-content h2 {
+    margin-bottom: 6px;
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.winner-party {
+    color: #2563eb;
+    font-weight: 800;
+}
+
+.winner-vote-count strong {
+    display: block;
+    color: #16a34a;
+    font-size: 50px;
+    line-height: 1;
+}
+
+.winner-vote-count span {
+    display: block;
+    margin-top: 8px;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.winner-candidate-card {
+    height: 100%;
+    padding: 22px;
+    border-radius: 22px;
+    background: white;
+    box-shadow: 0 15px 35px rgba(15,23,42,0.09);
+}
+
+.winner-photo,
+.winner-photo-placeholder {
+    width: 125px;
+    height: 125px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+}
+
+.winner-photo {
+    object-fit: cover;
+    object-position: top;
+}
+
+.winner-photo-placeholder {
+    display: grid;
+    place-items: center;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 50px;
+}
+
+.winner-score {
+    color: #16a34a;
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.winner-score span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .winner-main-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .winner-image-area {
+        max-width: 280px;
+        width: 100%;
+        margin: auto;
+    }
+}
+</style>
 {% endblock %}

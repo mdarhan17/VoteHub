@@ -1,0 +1,115 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Admin Dashboard</h2>
+        <p>Monitor elections, voters, candidates, and voting activity.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="stat-card blue">
+            <div>
+                <p>Total Voters</p>
+                <h3>{{ stats.total_voters }}</h3>
+            </div>
+            <i class="bi bi-people"></i>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card purple">
+            <div>
+                <p>Total Elections</p>
+                <h3>{{ stats.total_elections }}</h3>
+            </div>
+            <i class="bi bi-calendar-event"></i>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card green">
+            <div>
+                <p>Candidates</p>
+                <h3>{{ stats.total_candidates }}</h3>
+            </div>
+            <i class="bi bi-person-badge"></i>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card orange">
+            <div>
+                <p>Votes Cast</p>
+                <h3>{{ stats.total_votes }}</h3>
+            </div>
+            <i class="bi bi-check2-square"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="panel-card">
+            <div class="section-title">
+                <div>
+                    <h5>Quick Actions</h5>
+                    <p>Manage the main election workflow from one place.</p>
+                </div>
+            </div>
+
+            <div class="quick-actions premium-actions">
+                <a href="{{ url_for('admin.voters') }}" class="action-card blue-action">
+                    <div class="action-icon"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <h6>Manage Voters</h6>
+                        <p>Approve, reject, or block voter accounts</p>
+                    </div>
+                    <i class="bi bi-arrow-right action-arrow"></i>
+                </a>
+
+                <a href="{{ url_for('candidate.candidates') }}" class="action-card purple-action">
+                    <div class="action-icon"><i class="bi bi-person-badge-fill"></i></div>
+                    <div>
+                        <h6>Manage Candidates</h6>
+                        <p>Add candidates, photos, symbols and manifesto</p>
+                    </div>
+                    <i class="bi bi-arrow-right action-arrow"></i>
+                </a>
+
+                <a href="{{ url_for('election.elections') }}" class="action-card green-action">
+                    <div class="action-icon"><i class="bi bi-calendar2-event-fill"></i></div>
+                    <div>
+                        <h6>Manage Elections</h6>
+                        <p>Create elections and assign candidates</p>
+                    </div>
+                    <i class="bi bi-arrow-right action-arrow"></i>
+                </a>
+
+                <a href="{{ url_for('result.results') }}" class="action-card orange-action">
+                    <div class="action-icon"><i class="bi bi-bar-chart-fill"></i></div>
+                    <div>
+                        <h6>View Results</h6>
+                        <p>Publish results and export reports</p>
+                    </div>
+                    <i class="bi bi-arrow-right action-arrow"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="panel-card warning-panel approval-card">
+            <div class="approval-icon">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h5>Pending Approvals</h5>
+            <h2>{{ stats.pending_voters }}</h2>
+            <p>Voters waiting for verification.</p>
+            <a href="{{ url_for('admin.voters') }}" class="btn btn-warning btn-sm">Review Now</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Result Dashboard</h2>
+        <p>Publish, unpublish, and view election results.</p>
+    </div>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID</th>
+                    <th>Election</th>
+                    <th>Status</th>
+                    <th>Published</th>
+                    <th width="300">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if elections %}
+                    {% for election in elections %}
+                    <tr>
+                        <td>{{ election.election_id }}</td>
+                        <td>
+                            <b>{{ election.title }}</b><br>
+                            <small>{{ election.description }}</small>
+                        </td>
+                        <td>{{ election.status }}</td>
+                        <td>
+                            {% if election.result_published %}
+                                <span class="badge bg-success">Published</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not Published</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('result.election_result', election_id=election.election_id) }}" class="btn btn-sm btn-primary">View</a>
+
+                            {% if election.result_published %}
+                                <a href="{{ url_for('result.unpublish_result', election_id=election.election_id) }}" class="btn btn-sm btn-warning">Unpublish</a>
+                                <a href="{{ url_for('public_result.public_election_result', election_id=election.election_id) }}" target="_blank" class="btn btn-sm btn-success">Public</a>
+                            {% else %}
+                                <a href="{{ url_for('result.publish_result', election_id=election.election_id) }}" class="btn btn-sm btn-success">Publish</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No elections found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
